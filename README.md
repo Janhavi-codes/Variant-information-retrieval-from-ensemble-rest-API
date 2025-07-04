@@ -1,41 +1,26 @@
-import requests
+Variant Info Retrieval using Ensembl REST API
+This Python script reads a list of rsIDs (SNP IDs) from a text file and retrieves detailed variant annotation information using the Ensembl REST API.
 
-# Step 1: Ask user to enter the filename
-filename = input("Enter the path of your rsID text file: ")
+Features
+Takes a .txt file containing a list of rsIDs as input
 
-# Step 2: Read all rsIDs from the file
-with open(filename, "r") as file:
-    rsids = [line.strip() for line in file if line.strip()]
+Fetches variant annotations such as:
 
-# Step 3: Loop through each rsID
-for rsid in rsids:
-    url = f"https://rest.ensembl.org/variation/human/{rsid}?"
-    headers = {"Content-Type": "application/json"}
-    response = requests.get(url, headers=headers)
+Most severe consequence
 
-    # Step 4: Check for valid response and JSON
-    if response.status_code == 200 and response.text.strip():
-        try:
-            data = response.json()
+Mapped genes
 
-            print(f"\n Info for {rsid}:")
-            print(f"  Most Severe Consequence: {data.get('most_severe_consequence', 'N/A')}")
+Ancestral allele
 
-            genes = [m.get('gene_symbol') for m in data.get('mappings', []) if m.get('gene_symbol')]
-            print(f"  Mapped Genes: {genes if genes else 'N/A'}")
+Clinical significance
 
-            print(f"  Ancestral Allele: {data.get('ancestral_allele', 'N/A')}")
-            print(f"  Clinical Significance: {', '.join(data.get('clinical_significance', ['N/A']))}")
-            print(f"  Minor Allele: {data.get('minor_allele', 'N/A')}")
-            print(f"  Minor Allele Frequency: {data.get('minor_allele_freq', 'N/A')}")
+Minor allele & its frequency
 
-            synonyms = ", ".join(data.get('synonyms', [])) if data.get('synonyms') else "N/A"
-            print(f"   Synonyms: {synonyms}")
+Synonyms
 
-        except requests.exceptions.JSONDecodeError:
-            print(f"\n Response for {rsid} is not valid JSON. Skipping.")
-            continue
+Handles missing or malformed responses
 
-    else:
-        print(f"\nFailed to retrieve info for {rsid} (HTTP {response.status_code})")
+Requirements
+Python 3.x
 
+requests library
